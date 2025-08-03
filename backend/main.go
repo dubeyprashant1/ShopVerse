@@ -7,6 +7,7 @@ import (
 	"github.com/joho/godotenv"
 	"github.com/gin-gonic/gin"
 	"log"
+	"github.com/gin-contrib/cors"
 )
 
 func main() {
@@ -15,6 +16,21 @@ func main() {
 		log.Fatal("Error loading .env file")
 	}
 	r := gin.Default()
+	// After r := gin.Default()
+	r.Use(cors.New(cors.Config{
+		AllowOrigins:     []string{"http://localhost:5173"},
+		AllowMethods:     []string{"GET", "POST", "PUT", "DELETE"},
+		AllowHeaders:     []string{"Origin", "Authorization", "Content-Type"},
+		ExposeHeaders:    []string{"Content-Length"},
+		AllowCredentials: true,
+	}))
+
+
+	r.GET("/", func(c *gin.Context) {
+		c.JSON(200, gin.H{
+			"message": "Welcome to the E-commerce API!",
+		})
+	})
 
 	db := models.SetupDatabase()
 	if db != nil {
