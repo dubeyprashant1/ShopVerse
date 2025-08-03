@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-const BASE_URL = 'http://localhost:8080';
+export const BASE_URL = "http://localhost:8080";
 
 // Get token from localStorage (optional helper)
 const getToken = () => localStorage.getItem('accessToken');
@@ -27,17 +27,43 @@ export const signupUser = async (formData) => {
 // Login: POST /users/login
 export const loginUser = async (email, password) => {
   try {
-    const res = await axios.post(`${BASE_URL}/users/login`, { email, password });
-    return res.data; // Save accessToken and refreshToken from this response
+    const res = await axios.post(`${BASE_URL}/users/login`, 
+      { email, password }, 
+      {
+        headers: {
+          'Content-Type': 'application/json',
+          'Accept': 'application/json',
+        },
+        withCredentials: true, // optional: needed if you're using cookies
+      }
+    );
+    return res.data;
   } catch (err) {
-    throw err.response?.data || 'Login failed';
+    // Log the full error for debugging
+    console.error("Login error:", err);
+
+    // If server responded
+    if (err.response) {
+      const contentType = err.response.headers['content-type'];
+
+      if (contentType && contentType.includes('application/json')) {
+        throw err.response.data; // valid JSON error object from backend
+      } else {
+        throw 'Server error: returned non-JSON data'; // likely HTML or plain text
+      }
+    } else {
+      // No response received (e.g. network or CORS error)
+      throw 'Network or server error';
+    }
   }
 };
 
+
 // Refresh Token: POST /users/refresh
-export const refreshToken = async (refreshToken) => {
+export const refreshToken = async () => {
   try {
-    const res = await axios.post(`${BASE_URL}/users/refresh`, { refreshToken });
+    const token = localStorage.getItem('refreshToken');
+    const res = await axios.post(`${BASE_URL}/users/refresh`, { token });
     return res.data;
   } catch (err) {
     throw err.response?.data || 'Token refresh failed';

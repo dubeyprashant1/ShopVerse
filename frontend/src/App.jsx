@@ -8,9 +8,9 @@ import Navbar from './components/Navbar';
 
 function App() {
   return (
-    <>
+    <div className="app-container">
       <Navbar />
-      <div className="app-body">
+      <main className="app-body">
         <Routes>
           <Route path="/" element={<LandingPage />} />
           <Route path="/signup" element={<Signup />} />
@@ -18,9 +18,10 @@ function App() {
           <Route path="/home" element={<Home />} />
           <Route path="/cart" element={<Cart />} />
         </Routes>
-      </div>
-    </>
+      </main>
+    </div>
   );
 }
+
 
 export default App;

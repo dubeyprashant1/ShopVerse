@@ -1,5 +1,6 @@
 .navbar {
   position: fixed;
+  height: 80px;
   top: 0;
   left: 0;
   right: 0;
@@ -58,6 +59,8 @@
     flex-direction: column;
     align-items: flex-start;
     padding: 1rem 2rem;
+    height: auto; /* Let it grow with content */
+    padding-bottom: 1rem;
   }
 
   .navbar-brand {
@@ -98,7 +101,8 @@
   }
 
   .nav-links.active {
-    max-height: 400px;
-    padding-bottom: 1rem;
-  }
+  max-height: 400px;
+  padding-bottom: 0.5rem; /* was 1rem */
+  margin-top: 0; /* optional */
+}
 }

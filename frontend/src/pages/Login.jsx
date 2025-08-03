@@ -1,10 +1,40 @@
-import React from "react";
+import { useState } from 'react';
+import { loginUser } from "../api/axios";; 
 import { useNavigate } from "react-router-dom";
 import "./Login.css";
 import loginIllustration from "../assets/login.svg";
 
 const LoginPage = () => {
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [errorMsg, setErrorMsg] = useState('');
   const navigate = useNavigate();
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setErrorMsg('');
+
+    try {
+      const res = await loginUser(email, password);
+
+      // Save tokens to localStorage
+      localStorage.setItem('accessToken', res.access_token);
+      localStorage.setItem('refreshToken', res.refresh_token);
+
+      console.log(res.access_token, res.refresh_token);
+      // Redirect to home
+      navigate('/home');
+    } catch (err) {
+      // Handle backend errors
+      if (typeof err === 'string') {
+        setErrorMsg(err);
+      } else if (err.error) {
+        setErrorMsg(err.error);
+      } else {
+        setErrorMsg('Login failed');
+      }
+    }
+  };
 
   return (
     <div className="login-page">
@@ -15,14 +45,15 @@ const LoginPage = () => {
         <div className="login-title">
           <h2>Login</h2>
         </div>
-        <form>
+        {errorMsg && <p style={{ color: 'red' }}>{errorMsg}</p>}
+        <form onSubmit={handleSubmit}>
           <div>
             <label htmlFor="email">Email Address</label>
-            <input type="email" id="email" placeholder="Enter your email" required />
+            <input type="email" id="email" autocomplete="email" value={email} onChange={e => setEmail(e.target.value)} placeholder="Enter your email" required />
           </div>
           <div>
             <label htmlFor="password">Password</label>
-            <input type="password" id="password" placeholder="Enter your password" required />
+            <input type="password" id="password" autocomplete="password"  value={password} onChange={e => setPassword(e.target.value)} placeholder="Enter your password" required />
           </div>
           <button type="submit" className="login-btn">Login</button>
         </form>

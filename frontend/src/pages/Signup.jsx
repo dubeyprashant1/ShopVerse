@@ -2,6 +2,8 @@ import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import "./Signup.css";
 import illustration from "../assets/Signup.svg";
+import { signupUser } from "../api/axios"; 
+
 
 const SignupPage = () => {
   const navigate = useNavigate();
@@ -18,10 +20,17 @@ const SignupPage = () => {
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    console.log('Signup Data:', formData);
-    // Add API call or validation here
+    try {
+      const response = await signupUser(formData);
+      console.log("Signup success:", response);
+      alert("User registered successfully!");
+      navigate("/login"); // move to login after success
+    } catch (error) {
+      console.error("Signup failed:", error);
+      alert("Signup failed: " + (error?.error || "Please try again"));
+    }
   };
 
   return (
