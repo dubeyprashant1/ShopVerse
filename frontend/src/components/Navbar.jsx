@@ -24,14 +24,14 @@ const Navbar = () => {
         <div className="bar"></div>
       </div>
 
-      <nav className={`nav-links ${isOpen ? "active" : ""}`}>
-        <Link to="/" onClick={() => setIsOpen(false)}>Home</Link>
+      <nav className={`nav-links ${isOpen ? "active" : ""}`}>  
         <a href="#contact" onClick={() => setIsOpen(false)}>Contact</a>
 
         {!isLoggedIn && (
           <>
             <Link to="/login">Login</Link>
             <Link to="/signup">SignUp</Link>
+            <Link to="/" onClick={() => setIsOpen(false)}>Home</Link>
           </>
         )}
 
