@@ -1,52 +1,84 @@
-import { useEffect, useState } from 'react';
+import { useCart } from '../context/CartContext';
+import './Cart.css';
 import { useNavigate } from 'react-router-dom';
-
+import cartImage from '../assets/cart.svg'; // Illustration image
 
 export default function Cart() {
-  const [cartItems, setCartItems] = useState([]);
-  const [placingOrder, setPlacingOrder] = useState(false);
+  const { cart, removeFromCart, updateQuantity, clearCart } = useCart();
   const navigate = useNavigate();
 
-  useEffect(() => {
-    const items = localStorage.getItem('cart');
-    if (items) setCartItems(JSON.parse(items));
-  }, []);
-
-  const removeItem = (id) => {
-    const newItems = cartItems.filter(item => item.itemId !== id);
-    setCartItems(newItems);
-    localStorage.setItem('cart', JSON.stringify(newItems));
+  const handleIncrement = (id) => {
+    const item = cart.find((i) => i.id === id);
+    if (item) updateQuantity(id, item.quantity + 1);
   };
 
-  const placeOrder = () => {
-    setPlacingOrder(true);
-    setTimeout(() => {
-      alert('Order placed successfully!');
-      setCartItems([]);
-      localStorage.removeItem('cart');
-      setPlacingOrder(false);
-      navigate('/home');
-    }, 3000);
+  const handleDecrement = (id) => {
+    const item = cart.find((i) => i.id === id);
+    if (item.quantity > 1) {
+      updateQuantity(id, item.quantity - 1);
+    } else {
+      removeFromCart(id);
+    }
+  };
+
+  const totalAmount = cart.reduce(
+    (acc, item) => acc + item.price * item.quantity,
+    0
+  );
+
+  const handlePlaceOrder = () => {
+    alert('🎉 Order placed successfully!');
+    clearCart();
+    navigate('/home');
   };
 
   return (
-    <div className="cart-page">
-      <h2>Your Cart</h2>
-      {cartItems.length === 0 ? <p>Cart is empty</p> : (
-        <ul>
-          {cartItems.map(item => (
-            <li key={item.itemId}>
-              {item.name} - ₹{item.price}
-              <button onClick={() => removeItem(item.itemId)}>Remove</button>
-            </li>
-          ))}
-        </ul>
-      )}
-      {cartItems.length > 0 && (
-        <button onClick={placeOrder} disabled={placingOrder}>
-          {placingOrder ? 'Placing Order...' : 'Place Order'}
-        </button>
-      )}
+    <div className="cart-container">
+      <div className="cart-image">
+        <img src={cartImage} alt="Cart Illustration" />
+      </div>
+
+      <div className="cart-content">
+        <h2>Your Cart 🛒</h2>
+
+        {cart.length === 0 ? (
+          <p>Your cart is empty.</p>
+        ) : (
+          <>
+            <div className="cart-list">
+              {cart.map((item) => (
+                <div className="cart-item" key={item.id}>
+                  <img src={item.image} alt={item.name} />
+                  <div className="cart-details">
+                    <h3>{item.name}</h3>
+                    <p>Price: ₹{item.price}</p>
+
+                    <div className="quantity-controls">
+                      <button onClick={() => handleDecrement(item.id)}>-</button>
+                      <span>{item.quantity}</span>
+                      <button onClick={() => handleIncrement(item.id)}>+</button>
+                    </div>
+
+                    <button
+                      className="remove-btn"
+                      onClick={() => removeFromCart(item.id)}
+                    >
+                      Remove
+                    </button>
+                  </div>
+                </div>
+              ))}
+            </div>
+
+            <div className="cart-summary">
+              <h3>Total: ₹{totalAmount}</h3>
+              <button className="place-order-btn" onClick={handlePlaceOrder}>
+                Place Order
+              </button>
+            </div>
+          </>
+        )}
+      </div>
     </div>
   );
 }

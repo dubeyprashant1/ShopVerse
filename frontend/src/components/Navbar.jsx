@@ -1,10 +1,18 @@
 import { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
+import { useAuth } from "../context/AuthContext.jsx";
 import "./Navbar.css";
 import profileImage from "../assets/profile.svg";
 
 const Navbar = () => {
   const [isOpen, setIsOpen] = useState(false);
+  const { isLoggedIn, logout } = useAuth();
+  const navigate = useNavigate();
+
+  const handleLogout = () => {
+    logout(); // clears token + updates state
+    navigate("/login");
+  };
 
   return (
     <header className="navbar">
@@ -19,8 +27,31 @@ const Navbar = () => {
       <nav className={`nav-links ${isOpen ? "active" : ""}`}>
         <Link to="/" onClick={() => setIsOpen(false)}>Home</Link>
         <a href="#contact" onClick={() => setIsOpen(false)}>Contact</a>
-        <a href="/login" onClick={() => setIsOpen(false)}>Shop</a>
-        <a href="/signup" onClick={() => setIsOpen(false)}>SignUp</a>
+
+        {!isLoggedIn && (
+          <>
+            <Link to="/login">Login</Link>
+            <Link to="/signup">SignUp</Link>
+          </>
+        )}
+
+        {isLoggedIn && ( 
+          <>
+            <Link to="/cart">Cart</Link>
+            <Link
+  to="/login"
+  onClick={() => {
+    logout();
+    setIsOpen(false); // Close hamburger if open
+  }}
+  className="logout-link"
+>
+  Logout
+</Link>
+
+          </>
+        )}
+
         <img src={profileImage} alt="profile" />
       </nav>
     </header>

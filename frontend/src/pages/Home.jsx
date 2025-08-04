@@ -1,23 +1,36 @@
-import { useEffect, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useState } from 'react';
 import './Home.css';
 import productData from './productData';
+import { useCart } from '../context/CartContext'; // Make sure path is correct
 
 const Home = () => {
   const [quantities, setQuantities] = useState({});
+  const { addToCart, removeFromCart, updateQuantity } = useCart(); // Extend as needed
 
   const handleIncrement = (id) => {
-    setQuantities((prev) => ({
-      ...prev,
-      [id]: (prev[id] || 0) + 1,
-    }));
+    const product = productData.find((p) => p.id === id);
+    if (!product) return;
+
+    setQuantities((prev) => {
+      const newQty = (prev[id] || 0) + 1;
+      addToCart({ ...product, quantity: 1 }); // Always adds +1
+      return { ...prev, [id]: newQty };
+    });
   };
 
   const handleDecrement = (id) => {
-    setQuantities((prev) => ({
-      ...prev,
-      [id]: Math.max((prev[id] || 0) - 1, 0),
-    }));
+    setQuantities((prev) => {
+      const currentQty = prev[id] || 0;
+      const newQty = Math.max(currentQty - 1, 0);
+
+      if (newQty === 0) {
+        removeFromCart(id); // Remove completely if quantity is 0
+      } else {
+        updateQuantity(id, newQty); // Optional: Adjust quantity in cart
+      }
+
+      return { ...prev, [id]: newQty };
+    });
   };
 
   return (

@@ -1,6 +1,7 @@
 import { useState } from 'react';
-import { loginUser } from "../api/axios";; 
+import { loginUser } from "../api/axios";
 import { useNavigate } from "react-router-dom";
+import { useAuth } from "../context/AuthContext.jsx"; // ✅ import context
 import "./Login.css";
 import loginIllustration from "../assets/login.svg";
 
@@ -9,6 +10,7 @@ const LoginPage = () => {
   const [password, setPassword] = useState('');
   const [errorMsg, setErrorMsg] = useState('');
   const navigate = useNavigate();
+  const { login } = useAuth(); // ✅ get login function from context
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -21,11 +23,9 @@ const LoginPage = () => {
       localStorage.setItem('accessToken', res.access_token);
       localStorage.setItem('refreshToken', res.refresh_token);
 
-      console.log(res.access_token, res.refresh_token);
-      // Redirect to home
+      login(); // ✅ update context so Navbar updates
       navigate('/home');
     } catch (err) {
-      // Handle backend errors
       if (typeof err === 'string') {
         setErrorMsg(err);
       } else if (err.error) {
@@ -49,11 +49,27 @@ const LoginPage = () => {
         <form onSubmit={handleSubmit}>
           <div>
             <label htmlFor="email">Email Address</label>
-            <input type="email" id="email" autocomplete="email" value={email} onChange={e => setEmail(e.target.value)} placeholder="Enter your email" required />
+            <input
+              type="email"
+              id="email"
+              autoComplete="email"
+              value={email}
+              onChange={e => setEmail(e.target.value)}
+              placeholder="Enter your email"
+              required
+            />
           </div>
           <div>
             <label htmlFor="password">Password</label>
-            <input type="password" id="password" autocomplete="password"  value={password} onChange={e => setPassword(e.target.value)} placeholder="Enter your password" required />
+            <input
+              type="password"
+              id="password"
+              autoComplete="current-password"
+              value={password}
+              onChange={e => setPassword(e.target.value)}
+              placeholder="Enter your password"
+              required
+            />
           </div>
           <button type="submit" className="login-btn">Login</button>
         </form>
@@ -69,3 +85,4 @@ const LoginPage = () => {
 };
 
 export default LoginPage;
+

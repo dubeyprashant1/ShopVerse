@@ -5,9 +5,11 @@ import Login from './pages/Login';
 import Home from './pages/Home';
 import Cart from './pages/Cart';
 import Navbar from './components/Navbar';
+import { AuthProvider } from "./context/AuthContext";
 
 function App() {
   return (
+    <AuthProvider>
     <div className="app-container">
       <Navbar />
       <main className="app-body">
@@ -20,6 +22,7 @@ function App() {
         </Routes>
       </main>
     </div>
+    </AuthProvider>
   );
 }
 
